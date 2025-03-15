@@ -31,7 +31,7 @@ To try out these examples, clone the repository containing the necessary files:
 
 ```bash
 git clone https://github.com/example/find-command-examples.git
-cd find-command-examples
+cd Linux_Devops_Handson/Linux/find/
 ```
 
 
