@@ -4,18 +4,52 @@
 Google Compute Engine (GCE) is an Infrastructure-as-a-Service (IaaS) offering that provides scalable virtual machines (VMs) in Google Cloud.
 
 ### Features:
-- Predefined and custom machine types
-- Persistent disks and local SSDs
-- Automatic scaling and load balancing
-- Live migration and preemptible VMs
-- Security with IAM and VPC firewall rules
-- Integration with Kubernetes, AI/ML, and data services
+- **Predefined and Custom Machine Types**: Offers standard, high-memory, high-CPU, and GPU-enabled machine types.
+- **Persistent Disks and Local SSDs**: Supports different storage types including standard and SSD persistent disks, as well as high-performance local SSDs.
+- **Auto-scaling and Load Balancing**: Automatically scales instances up and down based on demand and integrates with load balancers.
+- **Live Migration**: Keeps VMs running even during maintenance events.
+- **Preemptible VMs & Spot VMs**: Cost-effective options for fault-tolerant workloads.
+- **Security**:
+  - IAM for access control
+  - VPC firewall rules
+  - Confidential Computing for enhanced data protection
+- **Integration**:
+  - Kubernetes, AI/ML, and data processing tools
+  - Cloud Storage, BigQuery, and other GCP services
+
+### Networking:
+- **VPC Networks & Subnets**: Configurable network topology with private and public IPs.
+- **Cloud Load Balancing**: Distributes traffic across instances.
+- **Cloud NAT**: Allows instances to access the internet securely.
+- **Interconnect & VPN**: Private connectivity between on-premises and GCP.
+
+### Disk & Storage Options:
+- **Persistent Disks** (Standard & SSD): Durable and auto-replicated storage.
+- **Local SSDs**: High IOPS storage for low-latency workloads.
+- **Filestore**: Managed file storage service.
+- **Cloud Storage Integration**: Object storage for scalable data storage.
+
+### Security & Compliance:
+- **Shielded VMs**: Protection against rootkits and firmware attacks.
+- **Confidential VMs**: Encryption-in-use for sensitive workloads.
+- **OS Patching & Compliance**: Automatic patching and security updates.
+- **IAM & Service Accounts**: Fine-grained access control.
+
+### Management & Automation:
+- **Instance Groups**: Managed and unmanaged instance groups for scalable applications.
+- **Startup Scripts & Metadata**: Custom initialization scripts.
+- **Terraform & Deployment Manager**: Infrastructure as Code (IaC) automation.
+- **Billing & Cost Optimization**:
+  - Sustained-use discounts
+  - Committed-use contracts
+  - Autoscaler for cost efficiency
 
 ### Use Cases:
 - Hosting applications and websites
 - Running containerized applications with Kubernetes
 - High-performance computing (HPC) workloads
 - Data processing and analytics
+- AI/ML model training and serving
 
 ## 2. Google Kubernetes Engine (GKE)
 Google Kubernetes Engine is a managed Kubernetes service that simplifies the deployment, management, and scaling of containerized applications.
