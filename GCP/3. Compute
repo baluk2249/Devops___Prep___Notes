@@ -1,0 +1,85 @@
+# GCP Compute Services
+
+## 1. Compute Engine
+Google Compute Engine (GCE) is an Infrastructure-as-a-Service (IaaS) offering that provides scalable virtual machines (VMs) in Google Cloud.
+
+### Features:
+- Predefined and custom machine types
+- Persistent disks and local SSDs
+- Automatic scaling and load balancing
+- Live migration and preemptible VMs
+- Security with IAM and VPC firewall rules
+- Integration with Kubernetes, AI/ML, and data services
+
+### Use Cases:
+- Hosting applications and websites
+- Running containerized applications with Kubernetes
+- High-performance computing (HPC) workloads
+- Data processing and analytics
+
+## 2. Google Kubernetes Engine (GKE)
+Google Kubernetes Engine is a managed Kubernetes service that simplifies the deployment, management, and scaling of containerized applications.
+
+### Features:
+- Fully managed Kubernetes clusters
+- Auto-scaling for nodes and workloads
+- Automatic upgrades and patching
+- Integrated logging and monitoring
+- Support for multi-cluster and hybrid deployments
+- Enhanced security with IAM and workload identity
+
+### Use Cases:
+- Running microservices-based applications
+- CI/CD pipelines with containerized workloads
+- Hybrid and multi-cloud Kubernetes clusters
+- AI/ML model training and serving
+
+## 3. App Engine
+Google App Engine is a Platform-as-a-Service (PaaS) offering that allows developers to build and deploy applications without managing infrastructure.
+
+### Features:
+- Fully managed serverless platform
+- Automatic scaling based on demand
+- Supports multiple programming languages (Python, Java, Go, Node.js, etc.)
+- Integrated logging, monitoring, and debugging
+- Secure networking with VPC integration
+- Zero-downtime deployments
+
+### Use Cases:
+- Hosting web and mobile applications
+- Backend services for APIs and microservices
+- Serverless data processing and analytics
+- Rapid prototyping and development
+
+## 4. Cloud Run
+Cloud Run is a managed compute platform that allows running stateless containers in a serverless environment.
+
+### Features:
+- Fully managed and automatically scales to zero
+- Deploy any containerized application
+- Supports HTTP and event-driven workloads
+- Pay-per-use pricing model
+- Integrated with Cloud Build and Artifact Registry
+- Secure with IAM and VPC networking
+
+### Use Cases:
+- Running microservices and APIs
+- Processing event-driven workloads
+- Hosting containerized web applications
+- Background tasks and automation
+
+## 5. Cloud Functions
+Cloud Functions is an event-driven, serverless compute service that enables running lightweight functions in response to cloud events.
+
+### Features:
+- Fully managed execution environment
+- Supports multiple programming languages (Node.js, Python, Go, Java, etc.)
+- Event-driven architecture with Pub/Sub, Cloud Storage, etc.
+- Scales automatically with traffic demand
+- Integrated logging, monitoring, and security
+
+### Use Cases:
+- Real-time data processing
+- Event-driven automation and workflows
+- API backends for mobile and web apps
+- IoT event processing and analytics
