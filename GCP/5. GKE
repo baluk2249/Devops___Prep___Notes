@@ -1,0 +1,96 @@
+# Google Kubernetes Engine (GKE)
+
+Google Kubernetes Engine (GKE) is a managed Kubernetes service provided by Google Cloud. It simplifies container orchestration, automates deployment, scaling, and operations of containerized applications.
+
+## Key Features:
+
+1. **Fully Managed Kubernetes**: Automates cluster management, scaling, and maintenance.
+2. **Auto-Scaling**:
+   - **Cluster Autoscaler**: Adjusts the number of nodes automatically.
+   - **Horizontal Pod Autoscaler (HPA)**: Adjusts the number of pods based on CPU/memory utilization.
+3. **High Availability**:
+   - Multi-zone and regional clusters for redundancy.
+   - Automated repairs and self-healing infrastructure.
+4. **Integrated Security**:
+   - IAM-based access control.
+   - GKE Sandbox for workload isolation.
+   - Binary Authorization for security policy enforcement.
+5. **Networking & Load Balancing**:
+   - Native integration with Google Cloud Load Balancing.
+   - Internal and external load balancing for services.
+   - Kubernetes Network Policies for traffic control.
+6. **CI/CD Integration**:
+   - Works with Cloud Build, Cloud Deploy, and third-party CI/CD tools.
+   - Supports GitOps workflows with tools like ArgoCD.
+7. **Monitoring & Logging**:
+   - Cloud Monitoring and Cloud Logging for real-time insights.
+   - Stackdriver integration for logging, tracing, and error reporting.
+8. **Hybrid & Multi-Cloud Support**:
+   - Anthos integration for managing clusters across different environments.
+   - Kubernetes Federation for multi-cluster management.
+9. **Stateful Workloads Support**:
+   - PersistentVolumes and StatefulSets for database and storage needs.
+10. **Serverless Workload Support**:
+   - Cloud Run for GKE to run stateless applications in a serverless manner.
+
+## GKE Cluster Types:
+
+1. **Zonal Cluster**: A single-zone deployment, best for cost-sensitive applications.
+2. **Regional Cluster**: Multi-zone deployment for high availability.
+3. **Autopilot Cluster**: Fully automated Kubernetes management with optimized cost and scaling.
+
+## Deployment Steps:
+
+### 1. Install Google Cloud SDK
+   ```sh
+   gcloud components install kubectl
+   ```
+
+### 2. Create a GKE Cluster
+   ```sh
+   gcloud container clusters create my-cluster --zone us-central1-a
+   ```
+
+### 3. Authenticate with the Cluster
+   ```sh
+   gcloud container clusters get-credentials my-cluster --zone us-central1-a
+   ```
+
+### 4. Deploy an Application
+   ```sh
+   kubectl create deployment my-app --image=gcr.io/my-project/my-app:v1
+   ```
+
+### 5. Expose the Application
+   ```sh
+   kubectl expose deployment my-app --type=LoadBalancer --port=80 --target-port=8080
+   ```
+
+### 6. Get Service Details
+   ```sh
+   kubectl get services my-app
+   ```
+
+### 7. Scale the Application
+   ```sh
+   kubectl scale deployment my-app --replicas=3
+   ```
+
+### 8. Monitor Pods and Logs
+   ```sh
+   kubectl get pods
+   kubectl logs -f my-app-pod
+   ```
+
+## Best Practices:
+
+- **Use Autopilot for Cost Optimization**: GKE Autopilot manages infrastructure automatically.
+- **Implement RBAC & IAM Policies**: Restrict access to Kubernetes resources.
+- **Enable Auto-Scaling**: Use Horizontal Pod Autoscaler and Cluster Autoscaler.
+- **Use ConfigMaps & Secrets**: Manage configuration and sensitive data securely.
+- **Leverage Helm Charts**: Simplify application deployment with Helm.
+- **Monitor & Log Efficiently**: Use Cloud Monitoring and Logging for insights.
+- **Secure Networking**: Enforce Network Policies and restrict public access.
+
+GKE provides a powerful, scalable, and managed Kubernetes experience, making it an ideal choice for deploying containerized applications. 🚀
+
