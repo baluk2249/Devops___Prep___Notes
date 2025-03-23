@@ -1,0 +1,49 @@
+# Google App Engine (GAE)
+
+Google App Engine (GAE) is a fully managed serverless platform that allows developers to build and deploy scalable web applications and APIs. It provides built-in load balancing, automatic scaling, and integration with Google Cloud services.
+
+## Key Features of Google App Engine:
+
+1. **Fully Managed Platform**: No need to manage infrastructure, as Google handles scaling, patching, and monitoring.
+2. **Automatic Scaling**: GAE automatically scales applications up and down based on traffic.
+3. **Supports Multiple Languages**: Supports Java, Python, Node.js, Go, Ruby, PHP, and custom runtimes.
+4. **Integrated DevOps Tools**: Works with Cloud Build, Cloud Logging, and Stackdriver for monitoring and logging.
+5. **Built-in Security**: Integrates with IAM, Cloud Security Scanner, and firewall rules.
+6. **Flexible and Standard Environments**:
+   - **Standard Environment**: Uses preconfigured runtime with fast startup times and automatic scaling.
+   - **Flexible Environment**: Runs applications in Docker containers, allowing custom dependencies and background processes.
+7. **Zero Server Management**: Google handles provisioning and server maintenance.
+8. **Microservices and API Deployment**: Supports deploying microservices, mobile backends, and RESTful APIs.
+9. **Built-in Load Balancing**: Distributes traffic efficiently to optimize performance.
+10. **Integrated Databases**: Supports Google Cloud SQL, Firestore, and Bigtable.
+
+## Use Cases:
+
+- Web applications with dynamic scaling
+- RESTful API backends
+- Microservices-based applications
+- Mobile app backends
+- Event-driven applications
+
+## Deployment Steps:
+
+### 1. Install Google Cloud SDK  
+   ```sh
+   gcloud components install app-engine-java
+   ```
+
+### 2. Initialize App Engine  
+   ```sh
+   gcloud app create --project=[PROJECT_ID]
+   ```
+
+### 3. Deploy the Application  
+   ```sh
+   gcloud app deploy
+   ```
+
+### 4. Access the Application  
+   ```sh
+   gcloud app browse
+   ```
+
