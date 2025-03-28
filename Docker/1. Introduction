@@ -1,0 +1,39 @@
+# Docker
+
+Docker is an open platform for developing, shipping, and running applications. Docker enables you to separate your applications from your infrastructure, allowing you to deliver software quickly.
+
+## Key Features
+- Open-source and written in Go language.
+- Based on containerization.
+- Several applications can run independently.
+
+## Docker Architecture
+Docker follows a client-server architecture consisting of several key components:
+
+- **Docker Client**: The user interface (CLI) to interact with the Docker daemon.
+- **Docker Daemon**: A background service that manages Docker objects like images, containers, and networks.
+- **Docker Engine**: The core of Docker, responsible for building and running containers.
+- **Docker Images**: Read-only templates used to create containers.
+- **Docker Registry**: A storage and distribution system for Docker images (e.g., Docker Hub, private registries).
+- **Docker Container**: A runtime instance of a Docker image that contains everything needed to run an application.
+
+## Types of Containers
+- **Interactive Containers**: Containers that run interactively, allowing users to execute commands inside the container (e.g., `docker run -it <image>`).
+- **Daemonized Containers**: Containers that run in the background (detached mode) using `-d` flag (e.g., `docker run -d <image>`).
+
+## Lifecycle of a Docker Container
+1. **Pull an Image**: `docker pull <image>`
+2. **Run a Container**: `docker run <image>`
+3. **List Running Containers**: `docker ps`
+4. **List All Containers**: `docker ps -a`
+5. **Stop a Container**: `docker stop <container_id>`
+6. **Restart a Container**: `docker restart <container_id>`
+7. **Remove a Container**: `docker rm <container_id>`
+8. **Remove an Image**: `docker rmi <image_id>`
+9. **Commit Changes**: `docker commit <container_id> <new_image_name>`
+
+Docker simplifies application deployment by providing an efficient way to package and distribute software in a consistent environment.
+
+---
+
+_This document provides a fundamental understanding of Docker and its components._
