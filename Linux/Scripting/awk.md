@@ -1,4 +1,4 @@
-# 📜 Mastering `awk`: Detailed Notes
+# 📜 `awk`
 
 ## 1. What is `awk`?
 - **`awk`** is a powerful **text-processing** language.
