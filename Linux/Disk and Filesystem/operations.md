@@ -108,7 +108,7 @@ sudo fsck -f /dev/sdX1
 - **PV** (Physical Volume)
 - **VG** (Volume Group)
 - **LV** (Logical Volume)
-
+ 
 ### Create LVM Setup
 ```bash
 sudo pvcreate /dev/sdX1
