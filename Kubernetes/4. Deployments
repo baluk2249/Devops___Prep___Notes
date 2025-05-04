@@ -1,0 +1,127 @@
+# Kubernetes Deployment
+
+## 1. What is a Deployment?
+
+A **Deployment** is a Kubernetes controller used to manage stateless applications by declaratively updating pods and ReplicaSets.
+
+* Provides rollout, rollback, and history features.
+* Ensures the desired state of ReplicaSets and pods is maintained.
+* Handles updates with zero downtime using rolling updates.
+
+## 2. Key Features
+
+* Declarative updates for Pods and ReplicaSets.
+* Rolling updates and rollbacks.
+* Scaling (up or down) the number of replicas.
+* Revision history tracking.
+
+## 3. Deployment Structure
+
+Example YAML:
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.21
+```
+
+### Key Fields:
+
+* **replicas**: Number of desired pods.
+* **selector**: Label selector to identify the pods.
+* **template**: Pod template used by the ReplicaSet.
+
+## 4. How Deployment Works
+
+* Creates a ReplicaSet that launches the desired pods.
+* If a new template is applied (e.g., new image), a new ReplicaSet is created.
+* Performs a **rolling update** by gradually replacing old pods with new ones.
+
+## 5. Rollouts and Rollbacks
+
+* **Rollout**: Gradually updates pods.
+* **Rollback**: Reverts to a previous ReplicaSet if the new version fails.
+
+Commands:
+
+```sh
+kubectl rollout status deployment <name>         # Check rollout progress
+kubectl rollout undo deployment <name>           # Rollback to previous version
+```
+
+## 6. Update Strategies
+
+* **RollingUpdate** (default): Incrementally updates pods with `maxUnavailable` and `maxSurge` settings.
+* **Recreate**: Terminates all old pods before creating new ones.
+
+Example:
+
+```yaml
+strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxSurge: 1
+    maxUnavailable: 1
+```
+
+## 7. Scaling a Deployment
+
+You can scale manually or automatically:
+
+### Manually:
+
+```sh
+kubectl scale deployment <name> --replicas=5
+```
+
+### Automatically:
+
+Use **Horizontal Pod Autoscaler (HPA)** based on CPU/memory usage.
+
+## 8. Revision History
+
+Kubernetes maintains a history of Deployment revisions.
+
+* Use `kubectl rollout history deployment <name>` to view revisions.
+* Limited by `revisionHistoryLimit` (default is 10).
+
+## 9. Use Cases
+
+* Stateless applications (e.g., web servers, APIs).
+* Continuous delivery pipelines.
+* Blue/Green or Canary deployments.
+
+## 10. Managing Deployment
+
+Common commands:
+
+```sh
+kubectl get deployments                        # List Deployments
+kubectl describe deployment <name>             # Detailed info
+kubectl edit deployment <name>                 # Edit live deployment
+kubectl delete deployment <name>               # Delete deployment
+```
+
+## 11. Best Practices
+
+* Always define **readiness/liveness probes**.
+* Use **RollingUpdate** for zero downtime.
+* Set appropriate **resource requests/limits**.
+* Monitor rollout using `kubectl rollout status`.
+* Avoid frequent updates with no changes (creates unnecessary ReplicaSets).
+
+---

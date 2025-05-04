@@ -1,0 +1,94 @@
+# Kubernetes Resource Requests and Limits
+
+## 1. What Are Resource Requests and Limits?
+
+Resource **requests** and **limits** in Kubernetes help define how much compute (CPU and memory) a container needs.
+
+* **Request**: Minimum amount of CPU/Memory the container is guaranteed.
+* **Limit**: Maximum amount of CPU/Memory the container is allowed to use.
+
+Kubernetes uses these to make scheduling decisions and to ensure resource fairness.
+
+## 2. Why Use Requests and Limits?
+
+* Prevent one container from using all node resources.
+* Enable fair scheduling across multiple workloads.
+* Avoid OOM (Out-Of-Memory) errors or CPU throttling.
+* Improve cluster resource utilization.
+
+## 3. Example YAML with Requests and Limits
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: resource-demo
+spec:
+  containers:
+  - name: demo-container
+    image: nginx
+    resources:
+      requests:
+        memory: "64Mi"
+        cpu: "250m"
+      limits:
+        memory: "128Mi"
+        cpu: "500m"
+```
+
+* `250m` = 250 millicores (0.25 vCPU)
+* `64Mi` = 64 Mebibytes of memory
+
+## 4. Behavior
+
+* If a container tries to use more than its **memory limit**, it is terminated (OOMKilled).
+* If a container uses more than its **CPU limit**, it is throttled.
+* Requests are used by the scheduler to place pods.
+
+## 5. ResourceQuota with Requests and Limits
+
+You can enforce limits cluster-wide using ResourceQuota:
+
+```yaml
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: quota-example
+  namespace: dev
+spec:
+  hard:
+    requests.cpu: "2"
+    requests.memory: 1Gi
+    limits.cpu: "4"
+    limits.memory: 2Gi
+```
+
+## 6. LimitRange (Default Limits)
+
+Set default requests/limits for a namespace:
+
+```yaml
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: limits
+  namespace: dev
+spec:
+  limits:
+  - default:
+      cpu: 500m
+      memory: 512Mi
+    defaultRequest:
+      cpu: 250m
+      memory: 256Mi
+    type: Container
+```
+
+## 7. Best Practices
+
+* Always set requests and limits for production workloads.
+* Use `LimitRange` to avoid missing resource configs.
+* Monitor usage to avoid under- or over-provisioning.
+* Tune based on application behavior.
+
+---

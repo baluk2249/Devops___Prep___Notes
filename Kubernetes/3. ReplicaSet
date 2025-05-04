@@ -1,0 +1,98 @@
+# Kubernetes ReplicaSet
+
+## 1. What is a ReplicaSet?
+
+A **ReplicaSet** is a Kubernetes controller that ensures a specified number of pod replicas are running at all times.
+
+* Automatically replaces pods that fail, are deleted, or are terminated.
+* Ensures high availability and fault tolerance.
+* Often used indirectly through Deployments.
+
+## 2. Key Features
+
+* Maintains **desired state** for the number of pod replicas.
+* Performs **self-healing** of failed or terminated pods.
+* Supports **label selectors** to manage pods.
+
+## 3. ReplicaSet Structure
+
+Example YAML:
+
+```yaml
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: my-replicaset
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+```
+
+### Fields:
+
+* **replicas**: Desired number of pod replicas.
+* **selector**: Labels used to identify pods managed by the ReplicaSet.
+* **template**: Pod template to create new replicas if needed.
+
+## 4. How ReplicaSet Works
+
+* Kubernetes compares current running pods with the desired count.
+* If pods are missing, it creates new ones.
+* If extra pods exist, it deletes them.
+
+## 5. Label Selector
+
+ReplicaSets manage pods using **label selectors**:
+
+* Must match the labels in the pod template.
+* Example: If `selector.matchLabels = { app: myapp }`, then pods must have the label `app: myapp`.
+
+⚠️ If the selector doesn’t match the pod labels, ReplicaSet won’t manage those pods.
+
+## 6. Manual vs Managed
+
+* You can create a ReplicaSet directly, but typically it’s managed by a **Deployment**.
+* Deployments wrap ReplicaSets to provide rolling updates, rollbacks, and declarative updates.
+
+## 7. Use Cases
+
+* Ensuring a specific number of stateless pod replicas.
+* High availability scenarios.
+* Maintaining resilience for critical services.
+
+## 8. Differences Between ReplicaSet and ReplicationController
+
+| Feature              | ReplicaSet            | ReplicationController |
+| -------------------- | --------------------- | --------------------- |
+| API version          | apps/v1               | v1                    |
+| Label selector       | Set-based and exact   | Exact only            |
+| Template structure   | Supports full PodSpec | Limited               |
+| Usage recommendation | Preferred             | Legacy                |
+
+## 9. Managing ReplicaSet
+
+Commands:
+
+```sh
+kubectl get rs                          # List ReplicaSets
+kubectl describe rs <replicaSet-name>   # Get details
+kubectl delete rs <replicaSet-name>     # Delete ReplicaSet
+```
+
+## 10. Best Practices
+
+* Use **Deployments** to manage ReplicaSets for better lifecycle control.
+* Always define a proper **label selector** that matches pod templates.
+* Monitor pod statuses using `kubectl get pods` and `kubectl describe rs`.
+
+---

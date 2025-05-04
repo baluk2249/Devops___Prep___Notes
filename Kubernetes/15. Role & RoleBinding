@@ -1,0 +1,95 @@
+# Kubernetes Role and RoleBinding
+
+## 1. What is a Role?
+
+A **Role** in Kubernetes grants permissions within a **namespace**. It defines a set of allowed actions (verbs) on specific resources.
+
+## 2. What is a RoleBinding?
+
+A **RoleBinding** assigns a **Role** to a **user, group, or service account**, granting them the permissions defined in the Role within a namespace.
+
+## 3. Role vs ClusterRole
+
+| Role                  | ClusterRole                                 |
+| --------------------- | ------------------------------------------- |
+| Namespace-scoped      | Cluster-wide or namespace-scoped            |
+| Used with RoleBinding | Used with ClusterRoleBinding or RoleBinding |
+
+## 4. Example: Role
+
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: dev
+  name: pod-reader
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "watch", "list"]
+```
+
+This Role allows reading pod information in the `dev` namespace.
+
+## 5. Example: RoleBinding
+
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: read-pods-binding
+  namespace: dev
+subjects:
+- kind: User
+  name: jane
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: pod-reader
+  apiGroup: rbac.authorization.k8s.io
+```
+
+This RoleBinding grants user `jane` the `pod-reader` Role in the `dev` namespace.
+
+## 6. Example: ServiceAccount Binding
+
+```yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: app-sa
+  namespace: dev
+```
+
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: bind-app-sa
+  namespace: dev
+subjects:
+- kind: ServiceAccount
+  name: app-sa
+  namespace: dev
+roleRef:
+  kind: Role
+  name: pod-reader
+  apiGroup: rbac.authorization.k8s.io
+```
+
+## 7. Verify Role and RoleBinding
+
+```bash
+kubectl get role -n dev
+kubectl describe role pod-reader -n dev
+kubectl get rolebinding -n dev
+```
+
+## 8. Best Practices
+
+* Use Role/RoleBinding for namespace-scoped access control.
+* Prefer ServiceAccounts over users for applications.
+* Follow the principle of least privilege.
+* Use ClusterRoles only when necessary.
+
+---

@@ -1,0 +1,117 @@
+# Kubernetes DaemonSet
+
+## 1. What is a DaemonSet?
+
+A **DaemonSet** ensures that a copy of a pod runs on all (or some) nodes in a Kubernetes cluster.
+
+* Automatically adds a pod to new nodes.
+* Commonly used for background system-level services.
+
+## 2. Key Features
+
+* Runs **one pod per node**.
+* Automatically handles new and removed nodes.
+* Can be scheduled on a **subset** of nodes using node selectors, taints, and tolerations.
+
+## 3. Use Cases
+
+* Log collection (e.g., Fluentd, Filebeat).
+* Monitoring agents (e.g., Prometheus Node Exporter).
+* Network plugins (e.g., Calico, Cilium).
+* Storage drivers.
+
+## 4. DaemonSet Structure
+
+Example YAML:
+
+```yaml
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: node-exporter
+  labels:
+    app: monitoring
+spec:
+  selector:
+    matchLabels:
+      name: node-exporter
+  template:
+    metadata:
+      labels:
+        name: node-exporter
+    spec:
+      containers:
+      - name: node-exporter
+        image: prom/node-exporter:v1.5.0
+        ports:
+        - containerPort: 9100
+```
+
+### Key Fields:
+
+* **selector**: Matches pods to the DaemonSet.
+* **template**: Pod template for each node.
+
+## 5. Scheduling on Specific Nodes
+
+You can limit where a DaemonSet runs using:
+
+### Node Selector:
+
+```yaml
+spec:
+  template:
+    spec:
+      nodeSelector:
+        node-type: monitoring
+```
+
+### Tolerations:
+
+```yaml
+spec:
+  template:
+    spec:
+      tolerations:
+      - key: "node-role"
+        operator: "Equal"
+        value: "infra"
+        effect: "NoSchedule"
+```
+
+## 6. Updating a DaemonSet
+
+* By default, DaemonSets do not support rolling updates unless `updateStrategy` is defined.
+
+```yaml
+updateStrategy:
+  type: RollingUpdate
+```
+
+Use `kubectl rollout` commands to manage updates if strategy is defined.
+
+## 7. Managing DaemonSets
+
+Commands:
+
+```sh
+kubectl get daemonsets                        # List DaemonSets
+kubectl describe daemonset <name>             # Detailed info
+kubectl delete daemonset <name>               # Delete DaemonSet
+```
+
+## 8. Best Practices
+
+* Use DaemonSet only when you truly need one pod per node.
+* Avoid resource-heavy containers unless necessary.
+* Label and taint nodes to control scheduling.
+* Monitor pod health using readiness/liveness probes.
+* Use `hostNetwork` or `hostPID` cautiously.
+
+## 9. Limitations
+
+* No built-in autoscaling (1 pod per node).
+* No guaranteed update strategy unless specified.
+* Can’t scale horizontally like Deployments or ReplicaSets.
+
+---

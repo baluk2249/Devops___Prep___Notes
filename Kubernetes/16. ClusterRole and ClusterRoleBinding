@@ -1,0 +1,94 @@
+# Kubernetes ClusterRole and ClusterRoleBinding
+
+## 1. What is a ClusterRole?
+
+A **ClusterRole** defines a set of permissions that apply at the **cluster level** or across **all namespaces**.
+
+* It can be used for granting access to cluster-scoped resources (e.g., nodes, persistent volumes).
+* It can also be used to grant namespace-scoped permissions across multiple namespaces.
+
+## 2. What is a ClusterRoleBinding?
+
+A **ClusterRoleBinding** grants the permissions defined in a **ClusterRole** to a user, group, or service account at the cluster scope.
+
+## 3. Use Cases
+
+* Granting access to cluster-wide resources.
+* Assigning namespace-level access across multiple namespaces.
+* Admin or monitoring roles.
+
+## 4. Example: ClusterRole
+
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: cluster-pod-reader
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list", "watch"]
+```
+
+This ClusterRole allows reading pods across all namespaces.
+
+## 5. Example: ClusterRoleBinding
+
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: read-pods-global
+subjects:
+- kind: User
+  name: jane
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: cluster-pod-reader
+  apiGroup: rbac.authorization.k8s.io
+```
+
+This ClusterRoleBinding grants user `jane` permission to read pods across the entire cluster.
+
+## 6. Example: ServiceAccount ClusterRoleBinding
+
+```yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: global-reader
+  namespace: monitoring
+```
+
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: bind-global-reader
+subjects:
+- kind: ServiceAccount
+  name: global-reader
+  namespace: monitoring
+roleRef:
+  kind: ClusterRole
+  name: cluster-pod-reader
+  apiGroup: rbac.authorization.k8s.io
+```
+
+## 7. Verify ClusterRole and ClusterRoleBinding
+
+```bash
+kubectl get clusterrole
+kubectl describe clusterrole cluster-pod-reader
+kubectl get clusterrolebinding
+```
+
+## 8. Best Practices
+
+* Use ClusterRoles only when necessary.
+* Prefer namespace-scoped Roles for fine-grained control.
+* Always follow the principle of least privilege.
+* Audit and monitor bindings regularly.
+
+---

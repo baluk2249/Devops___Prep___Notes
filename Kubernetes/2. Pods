@@ -1,0 +1,186 @@
+# Kubernetes Pod
+
+## 1. What is a Pod?
+
+A **Pod** is the smallest and simplest unit in the Kubernetes object model that you can create or deploy. It represents a single instance of a running process in a cluster.
+
+* A pod encapsulates one or more tightly coupled containers.
+* It is an abstraction over the container runtime (e.g., Docker, containerd).
+* All containers in a pod share:
+
+  * **Network namespace** (IP address and port space)
+  * **Storage volumes**
+  * **Linux namespaces** (like IPC, PID)
+  * **Lifecycle and management context**
+
+## 2. Pod Structure
+
+A pod definition is typically written in YAML and includes:
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-pod
+spec:
+  containers:
+  - name: my-container
+    image: nginx
+    ports:
+    - containerPort: 80
+```
+
+### Main Fields in Pod Spec:
+
+* **metadata**: Includes the pod name, labels, annotations.
+* **spec**:
+
+  * **containers**: Array of container specifications.
+  * **volumes**: Definitions of shared volumes.
+  * **restartPolicy**: Defines pod restart behavior (`Always`, `OnFailure`, `Never`).
+  * **initContainers**: Special containers that run before app containers.
+  * **affinity**, **nodeSelector**: Scheduling rules.
+  * **tolerations** and **taints**: Influence scheduling decisions.
+
+## 3. Multi-Container Pods
+
+Although typically pods have one container, sometimes they have multiple containers that work together:
+
+### Patterns:
+
+* **Sidecar**: Assists main container (e.g., log shipper, proxy).
+* **Ambassador**: Acts as a proxy to external services.
+* **Adapter**: Transforms output from main container.
+
+All containers in a multi-container pod:
+
+* Share the same localhost network.
+* Can communicate via `localhost:<port>`.
+
+## 4. Pod Lifecycle Phases
+
+Pod phases reflect the **overall status**:
+
+* **Pending**: Pod accepted, but not all containers created.
+* **Running**: Pod scheduled, containers running.
+* **Succeeded**: All containers completed successfully.
+* **Failed**: All containers terminated, one or more in error.
+* **Unknown**: State cannot be determined (e.g., network issues).
+
+### Container lifecycle states:
+
+* **Waiting**
+* **Running**
+* **Terminated**
+
+## 5. Pod Networking
+
+Each pod:
+
+* Gets a **unique IP address** in the cluster.
+* Shares this IP among its containers.
+* Can communicate directly with other pods without NAT.
+* Communicates with services using DNS or environment variables.
+
+### DNS and Environment Variables:
+
+* Kubernetes automatically assigns DNS entries to services and pods.
+* Each pod can access other services via `<service-name>.<namespace>.svc.cluster.local`.
+
+## 6. Pod Storage
+
+Pods support various types of storage:
+
+* **emptyDir**: Temporary storage shared by containers in a pod.
+* **hostPath**: Mounts a file from the host node.
+* **Persistent Volumes (PV)** and **Persistent Volume Claims (PVC)**: Attach persistent cloud/distributed storage.
+* **configMap** and **secret** volumes: Inject configuration and credentials.
+
+## 7. Pod Management
+
+Pods are typically **not created directly in production**. Instead, they are managed by higher-level controllers:
+
+* **ReplicaSet**: Ensures specified number of pod replicas.
+* **Deployment**: Manages ReplicaSets for rolling updates and rollbacks.
+* **StatefulSet**: Manages ordered, persistent pods with stable identities.
+* **DaemonSet**: Ensures a copy of a pod runs on all (or some) nodes.
+* **Job/CronJob**: For batch/periodic workloads.
+
+## 8. Pod Health Checks
+
+Kubernetes supports two types of health probes:
+
+* **Liveness Probe**: Checks if the app is alive (restarts container if failed).
+* **Readiness Probe**: Checks if the app is ready to accept traffic.
+
+These are defined in the pod spec under the container section:
+
+```yaml
+livenessProbe:
+  httpGet:
+    path: /healthz
+    port: 8080
+  initialDelaySeconds: 5
+  periodSeconds: 10
+```
+
+## 9. Pod Termination and Graceful Shutdown
+
+* When a pod is deleted, Kubernetes:
+
+  * Sends **SIGTERM** to containers.
+  * Waits for `terminationGracePeriodSeconds`.
+  * Then sends **SIGKILL** if container doesn’t stop.
+* You can define `preStop` hooks to perform cleanup.
+
+## 10. Debugging Pods
+
+Useful commands:
+
+```sh
+kubectl get pods                 # List pods
+kubectl describe pod <pod-name> # Detailed info, events
+kubectl logs <pod-name>         # View logs
+kubectl exec -it <pod-name> -- /bin/sh # Shell into container
+```
+
+
+## 11. Resource Requests and Limits
+
+Kubernetes allows defining **resource requests** and **limits** for containers to manage CPU and memory effectively, enabling better scheduling and stability.
+
+### a. **Resource Request**
+
+* Minimum amount of CPU or memory that a container requires.
+* Kubernetes uses this value to schedule the container on a node with sufficient resources.
+
+### b. **Resource Limit**
+
+* The maximum amount of CPU or memory a container can use.
+* If the container exceeds the limit, it may be throttled (CPU) or killed (memory).
+
+### Example:
+
+```yaml
+resources:
+  requests:
+    memory: "256Mi"
+    cpu: "250m"
+  limits:
+    memory: "512Mi"
+    cpu: "500m"
+```
+
+### Units:
+
+* **CPU**: Specified in cores (1 = 1 core, 500m = 0.5 core).
+* **Memory**: Specified in bytes (e.g., `Mi`, `Gi`).
+
+### Effects:
+
+* If a pod exceeds memory limit, it is **OOMKilled**.
+* If a pod exceeds CPU limit, it is **throttled**, not killed.
+* If you don't specify limits, the pod can use unlimited CPU/memory (may affect other pods).
+
+
+

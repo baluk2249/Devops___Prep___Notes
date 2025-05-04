@@ -1,0 +1,122 @@
+# Kubernetes StatefulSet
+
+## 1. What is a StatefulSet?
+
+A **StatefulSet** is a Kubernetes controller used to manage stateful applications.
+
+* Ensures **stable, unique network identities** and **persistent storage** for each pod.
+* Maintains the **order** of deployment, scaling, and deletion.
+* Ideal for databases and other stateful services.
+
+## 2. Key Features
+
+* Stable, unique **pod names** (e.g., `web-0`, `web-1`).
+* Stable network identity using DNS (e.g., `web-0.service-name`).
+* Persistent volumes that retain data across pod restarts.
+* Ordered pod creation, scaling, and deletion.
+
+## 3. StatefulSet Structure
+
+Example YAML:
+
+```yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: web
+spec:
+  serviceName: "nginx"
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+  volumeClaimTemplates:
+  - metadata:
+      name: www
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
+```
+
+### Key Fields:
+
+* **serviceName**: Headless service for stable DNS.
+* **volumeClaimTemplates**: Creates PVCs for each pod.
+* **replicas**: Number of desired pods.
+
+## 4. Headless Services
+
+StatefulSets require a **headless service** to provide DNS names:
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+spec:
+  clusterIP: None
+  selector:
+    app: nginx
+  ports:
+  - port: 80
+```
+
+* `clusterIP: None` makes it headless.
+* Each pod gets a stable DNS like `web-0.nginx.default.svc.cluster.local`.
+
+## 5. Persistent Storage
+
+* Uses `volumeClaimTemplates` to provide each pod with a unique PVC.
+* PVCs are **not deleted** when the StatefulSet is deleted.
+* Ensures data is retained across pod restarts.
+
+## 6. Pod Management
+
+* **Ordered Creation**: Pods are created sequentially (`web-0` before `web-1`).
+* **Ordered Deletion**: Last pod is terminated first.
+* Ensures consistent application behavior.
+
+## 7. Use Cases
+
+* Databases (e.g., MySQL, PostgreSQL, MongoDB).
+* Stateful applications (e.g., Zookeeper, Kafka).
+* Applications requiring persistent storage and identity.
+
+## 8. Managing StatefulSet
+
+Commands:
+
+```sh
+kubectl get statefulsets                    # List StatefulSets
+kubectl describe statefulset <name>         # Detailed info
+kubectl delete statefulset <name>           # Delete StatefulSet
+```
+
+## 9. Differences: Deployment vs StatefulSet
+
+| Feature      | Deployment          | StatefulSet        |
+| ------------ | ------------------- | ------------------ |
+| Pod identity | Not stable          | Stable             |
+| Storage      | Shared or ephemeral | Persistent per pod |
+| DNS          | Shared              | Unique per pod     |
+| Pod ordering | Not guaranteed      | Guaranteed         |
+| Use case     | Stateless apps      | Stateful apps      |
+
+## 10. Best Practices
+
+* Use StatefulSet only when stable identity or storage is required.
+* Always define a **headless service**.
+* Ensure appropriate **volume storage class** for PVCs.
+* Monitor individual pod status due to ordered operations.
+
+---

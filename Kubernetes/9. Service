@@ -1,0 +1,123 @@
+# Kubernetes Service
+
+## 1. What is a Service?
+
+A **Service** in Kubernetes is an abstraction that defines a logical set of Pods and a policy by which to access them.
+
+* Enables communication between different components of an application.
+* Provides stable IPs and DNS names for Pods.
+* Can load balance traffic across a set of pods.
+
+## 2. Types of Services
+
+### a. ClusterIP (Default)
+
+* Accessible only within the cluster.
+* Used for internal communication.
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-service
+spec:
+  selector:
+    app: my-app
+  ports:
+  - port: 80
+    targetPort: 8080
+  type: ClusterIP
+```
+
+### b. NodePort
+
+* Exposes the service on a static port on each node’s IP.
+* Useful for external access for development/testing.
+
+```yaml
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    targetPort: 8080
+    nodePort: 30080
+```
+
+Access with `NodeIP:30080`
+
+### c. LoadBalancer
+
+* Provisions an external load balancer (supported by cloud providers).
+* Used for production-grade external access.
+
+```yaml
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 8080
+```
+
+### d. ExternalName
+
+* Maps a service to an external DNS name.
+* No proxying; returns CNAME record.
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: external-service
+spec:
+  type: ExternalName
+  externalName: example.com
+```
+
+## 3. Service Selectors
+
+* Services use labels to match Pods.
+* If no selector is defined, endpoints must be manually managed.
+
+```yaml
+selector:
+  app: my-app
+```
+
+## 4. DNS and Service Discovery
+
+KubeDNS/CoreDNS assigns DNS entries to Services:
+
+```
+<service-name>.<namespace>.svc.cluster.local
+```
+
+## 5. Headless Services
+
+Used when you want direct access to individual pod IPs (e.g., for StatefulSets):
+
+```yaml
+spec:
+  clusterIP: None
+```
+
+## 6. Managing Services
+
+```sh
+kubectl get svc                           # List services
+kubectl describe svc <name>              # Describe service
+kubectl delete svc <name>                # Delete service
+```
+
+## 7. Best Practices
+
+* Use appropriate service types (ClusterIP for internal, LoadBalancer for external).
+* Use readiness probes to prevent traffic to unready pods.
+* Combine with Ingress for better routing control.
+
+## 8. Limitations
+
+* NodePort range is limited (default 30000-32767).
+* LoadBalancer support depends on cloud provider.
+* Services do not provide traffic routing by default; use Ingress for advanced routing.
+
+---

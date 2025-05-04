@@ -1,0 +1,175 @@
+# Kubernetes Pod: Detailed Notes
+
+... (existing content remains unchanged) ...
+
+---
+
+# Kubernetes ReplicaSet: Detailed Notes
+
+... (ReplicaSet content remains unchanged) ...
+
+---
+
+# Kubernetes Deployment: Detailed Notes
+
+... (Deployment content remains unchanged) ...
+
+---
+
+# Kubernetes StatefulSet: Detailed Notes
+
+... (StatefulSet content remains unchanged) ...
+
+---
+
+# Kubernetes DaemonSet: Detailed Notes
+
+... (DaemonSet content remains unchanged) ...
+
+---
+
+# Kubernetes Job: Detailed Notes
+
+... (Job content remains unchanged) ...
+
+---
+
+# Kubernetes CronJob: Detailed Notes
+
+... (CronJob content remains unchanged) ...
+
+---
+
+# Kubernetes Service: Detailed Notes
+
+... (Service content remains unchanged) ...
+
+---
+
+# Kubernetes ConfigMap: Detailed Notes
+
+... (ConfigMap content remains unchanged) ...
+
+---
+
+# Kubernetes Secret: Detailed Notes
+
+... (Secret content remains unchanged) ...
+
+---
+
+# Kubernetes Namespace
+
+## 1. What is a Namespace?
+
+A **Namespace** in Kubernetes is a way to divide cluster resources between multiple users or teams. It provides a mechanism to isolate groups of resources within a single cluster.
+
+* Namespaces are intended for use in environments with many users spread across multiple teams or projects.
+* They help in resource allocation, access control, and organizing objects.
+
+## 2. Use Cases
+
+* Multi-tenant environments.
+* Separate environments (dev, test, prod).
+* Resource quota management.
+* Role-based access control (RBAC) isolation.
+
+## 3. Default Namespaces
+
+* `default`: The default namespace for objects with no other namespace.
+* `kube-system`: Contains system components like kube-dns, kube-proxy.
+* `kube-public`: Readable by all users; used for cluster info.
+* `kube-node-lease`: Used for node heartbeat leases.
+
+## 4. Creating a Namespace
+
+### a. Using CLI
+
+```bash
+kubectl create namespace dev-team
+```
+
+### b. Using YAML
+
+```yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dev-team
+```
+
+Apply:
+
+```bash
+kubectl apply -f namespace.yaml
+```
+
+## 5. Working with Namespaces
+
+* List all namespaces:
+
+```bash
+kubectl get namespaces
+```
+
+* View resources in a namespace:
+
+```bash
+kubectl get pods -n dev-team
+```
+
+* Set default namespace for kubectl:
+
+```bash
+kubectl config set-context --current --namespace=dev-team
+```
+
+## 6. Namespace in Resource Definitions
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  namespace: dev-team
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+```
+
+## 7. Resource Quotas and Limits
+
+Namespaces allow the use of **ResourceQuota** to control resource usage:
+
+```yaml
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: dev-quota
+  namespace: dev-team
+spec:
+  hard:
+    pods: "10"
+    requests.cpu: "4"
+    requests.memory: 8Gi
+    limits.cpu: "10"
+    limits.memory: 16Gi
+```
+
+## 8. Deleting a Namespace
+
+```bash
+kubectl delete namespace dev-team
+```
+
+> Note: Deleting a namespace deletes all resources inside it.
+
+## 9. Best Practices
+
+* Use namespaces to separate environments and teams.
+* Apply resource quotas and network policies per namespace.
+* Avoid too many namespaces for small workloads.
+* Use meaningful names for better management.
+
+---

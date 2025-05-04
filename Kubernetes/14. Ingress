@@ -1,0 +1,103 @@
+# Kubernetes Ingress
+
+## 1. What is Ingress?
+
+Ingress is an API object that manages external access to services in a Kubernetes cluster, typically HTTP or HTTPS.
+
+* Acts as a reverse proxy that routes external traffic to internal services.
+* Can handle SSL/TLS termination, path-based routing, host-based routing, etc.
+
+## 2. Why Use Ingress?
+
+* Centralized routing configuration.
+* SSL termination and TLS management.
+* Reduce need for exposing services via `NodePort` or `LoadBalancer`.
+
+## 3. Ingress Controller
+
+An Ingress object needs an Ingress Controller (like NGINX, Traefik, or HAProxy) to fulfill the routing rules.
+
+Install NGINX Ingress Controller (example):
+
+```bash
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.9.0/deploy/static/provider/cloud/deploy.yaml
+```
+
+## 4. Basic Ingress YAML Example
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: example-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - host: example.com
+    http:
+      paths:
+      - path: /app1
+        pathType: Prefix
+        backend:
+          service:
+            name: app1-service
+            port:
+              number: 80
+      - path: /app2
+        pathType: Prefix
+        backend:
+          service:
+            name: app2-service
+            port:
+              number: 80
+```
+
+## 5. TLS/HTTPS Example
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: tls-example-ingress
+spec:
+  tls:
+  - hosts:
+    - example.com
+    secretName: tls-secret
+  rules:
+  - host: example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: my-service
+            port:
+              number: 80
+```
+
+## 6. Create a TLS Secret
+
+```bash
+kubectl create secret tls tls-secret \
+  --cert=path/to/tls.crt \
+  --key=path/to/tls.key
+```
+
+## 7. Verify Ingress
+
+```bash
+kubectl get ingress
+kubectl describe ingress <ingress-name>
+```
+
+## 8. Best Practices
+
+* Use a wildcard DNS domain for dynamic environments.
+* Enable health checks and rate limiting via annotations.
+* Use cert-manager for auto TLS renewal.
+* Monitor ingress logs for traffic insights.
+
+---

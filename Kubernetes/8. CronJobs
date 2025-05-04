@@ -1,0 +1,111 @@
+# Kubernetes CronJob
+
+## 1. What is a CronJob?
+
+A **CronJob** in Kubernetes runs a Job on a **recurring schedule**.
+
+* Based on cron syntax (e.g., `"0 5 * * *"`).
+* Useful for periodic and recurring tasks.
+
+## 2. Key Features
+
+* Runs Jobs at scheduled times.
+* Creates new Jobs for each scheduled execution.
+* Manages history of successful and failed Jobs.
+
+## 3. Use Cases
+
+* Nightly backups.
+* Regular data sync or cleanup.
+* Sending periodic reports or emails.
+* Scheduled health checks or batch processing.
+
+## 4. CronJob Structure
+
+Basic CronJob Example:
+
+```yaml
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: hello-cronjob
+spec:
+  schedule: "*/5 * * * *"  # Every 5 minutes
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: hello
+            image: busybox
+            args:
+            - /bin/sh
+            - -c
+            - date; echo Hello from CronJob
+          restartPolicy: OnFailure
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+```
+
+### Key Fields:
+
+* **schedule**: Cron expression for when the job should run.
+* **jobTemplate**: Pod spec for each job execution.
+* **successfulJobsHistoryLimit**: Number of successful jobs to retain.
+* **failedJobsHistoryLimit**: Number of failed jobs to retain.
+
+## 5. Cron Schedule Format
+
+Standard cron syntax:
+
+```
+ ┌───────────── minute (0 - 59)
+ │ ┌───────────── hour (0 - 23)
+ │ │ ┌───────────── day of month (1 - 31)
+ │ │ │ ┌───────────── month (1 - 12)
+ │ │ │ │ ┌───────────── day of week (0 - 6) (Sunday to Saturday)
+ │ │ │ │ │
+ │ │ │ │ │
+ * * * * *
+```
+
+## 6. Managing CronJobs
+
+Commands:
+
+```sh
+kubectl get cronjobs                       # List CronJobs
+kubectl describe cronjob <name>           # Describe CronJob
+kubectl delete cronjob <name>             # Delete CronJob
+kubectl get jobs --watch                  # Monitor job creation by CronJob
+```
+
+## 7. Best Practices
+
+* Set `concurrencyPolicy` to control parallel job execution:
+
+  * `Allow` (default): allows overlapping jobs
+  * `Forbid`: skips new job if prior is still running
+  * `Replace`: replaces the running job
+
+```yaml
+spec:
+  concurrencyPolicy: Forbid
+```
+
+* Use `startingDeadlineSeconds` to prevent missed schedules:
+
+```yaml
+spec:
+  startingDeadlineSeconds: 100
+```
+
+* Always define limits on job history retention.
+
+## 8. Limitations
+
+* Clock skew can affect timing.
+* Node failure or API server unavailability can delay or skip execution.
+* Heavy CronJobs can overload the system if scheduled too frequently.
+
+---

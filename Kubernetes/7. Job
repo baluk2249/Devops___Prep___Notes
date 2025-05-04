@@ -1,0 +1,112 @@
+# Kubernetes Job
+
+## 1. What is a Job?
+
+A **Job** in Kubernetes is a controller that creates one or more pods to run a task to **completion**.
+
+* Ensures that a specified number of pods **successfully complete**.
+* Used for **batch** or **short-lived** tasks.
+* Once the task is done, the pod(s) are terminated.
+
+## 2. Key Features
+
+* Runs to completion (unlike Deployments or DaemonSets).
+* Can run **parallel or sequential tasks**.
+* Automatically retries failed pods (based on backoff policy).
+
+## 3. Job Use Cases
+
+* Data processing tasks (e.g., ETL jobs).
+* Sending emails or notifications.
+* Running backups or batch jobs.
+* One-time script or initialization tasks.
+
+## 4. Job Structure
+
+Basic Job Example:
+
+```yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: hello-job
+spec:
+  template:
+    spec:
+      containers:
+      - name: hello
+        image: busybox
+        command: ["echo", "Hello from Kubernetes Job"]
+      restartPolicy: Never
+  backoffLimit: 4
+```
+
+### Key Fields:
+
+* **template**: Pod spec for the job.
+* **restartPolicy**: Must be `Never` or `OnFailure`.
+* **backoffLimit**: Number of retries before considering the Job failed.
+
+## 5. Parallel Jobs
+
+You can run multiple pods in parallel:
+
+```yaml
+spec:
+  completions: 3
+  parallelism: 2
+```
+
+* **completions**: Total number of successful runs required.
+* **parallelism**: Number of pods that can run in parallel.
+
+### Example:
+
+```yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: parallel-job
+spec:
+  completions: 5
+  parallelism: 2
+  template:
+    spec:
+      containers:
+      - name: worker
+        image: busybox
+        command: ["sh", "-c", "echo Parallel Job && sleep 10"]
+      restartPolicy: OnFailure
+```
+
+## 6. Managing Jobs
+
+Commands:
+
+```sh
+kubectl get jobs                         # List Jobs
+kubectl describe job <name>              # Job details
+kubectl delete job <name>                # Delete Job and its pods
+kubectl get pods --show-labels           # Check pod status and labels
+```
+
+## 7. Best Practices
+
+* Set `backoffLimit` to control retries.
+* Use `ttlSecondsAfterFinished` to auto-clean completed jobs:
+
+```yaml
+spec:
+  ttlSecondsAfterFinished: 100
+```
+
+* Set `activeDeadlineSeconds` to limit job run time.
+* Use labels to track job pods.
+
+## 8. Limitations
+
+* Not ideal for long-running processes.
+* Completed jobs still consume etcd entries unless cleaned.
+* Pods are not rescheduled if the node fails after pod success.
+
+---

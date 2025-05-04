@@ -1,0 +1,126 @@
+# Kubernetes Architecture
+
+Kubernetes is a container orchestration platform that automates deploying, scaling, and managing containerized applications. Its architecture follows a master-slave model and is designed for high scalability, flexibility, and fault tolerance.
+
+## 1. Kubernetes Cluster Components
+
+A Kubernetes cluster consists of several key components, divided into two major sections:
+
+* **Control Plane**: The brain of the Kubernetes cluster responsible for managing and controlling the entire system.
+* **Node**: The machines that run the containers and workloads managed by Kubernetes.
+
+## 2. Control Plane Components
+
+The control plane is responsible for the global management of the cluster, ensuring that the desired state of the cluster matches the actual state. It comprises several components:
+
+* **Kube-API Server**:
+
+  * Acts as the entry point for all administrative tasks and communication with the cluster.
+  * All requests are sent to the API server, which processes them and updates the state of the cluster.
+  * Exposes a RESTful API for interacting with Kubernetes resources.
+  * Stateless and scalable.
+
+* **etcd**:
+
+  * A distributed key-value store used to store all cluster data, including configuration and state.
+  * Highly available and fault-tolerant.
+
+* **Kube-Scheduler**:
+
+  * Watches for unscheduled pods and assigns them to appropriate nodes.
+  * Considers resources, constraints, and policies.
+
+* **Kube-Controller-Manager**:
+
+  * Runs various controllers that monitor cluster state and maintain the desired state.
+  * Includes Node Controller, Replication Controller, Deployment Controller, etc.
+
+* **Cloud Controller Manager**:
+
+  * Optional component for integrating with cloud providers.
+  * Handles cloud-specific tasks like load balancer and volume provisioning.
+
+## 3. Node Components
+
+Nodes in Kubernetes are physical or virtual machines that run the actual workloads. Each node contains:
+
+* **Kubelet**:
+
+  * Agent that runs on each node and ensures containers are running as expected.
+  * Communicates with the API server.
+
+* **Kube Proxy**:
+
+  * Maintains network rules and allows communication between pods.
+  * Manages virtual IPs and service traffic.
+
+* **Container Runtime**:
+
+  * Software responsible for running containers (e.g., Docker, containerd).
+
+* **Pod**:
+
+  * The smallest deployable unit.
+  * May contain one or more containers with shared storage and network resources.
+
+## 4. Kubernetes Networking
+
+* **Pod Network**: Each pod gets a unique IP. All pods can communicate without NAT.
+* **Service**: Stable endpoint for accessing a group of pods.
+* **Ingress**: Manages external HTTP/HTTPS access to services.
+* **Network Policies**: Define rules for traffic flow between pods.
+
+## 5. Kubernetes Objects
+
+* **Pod**: Represents an application instance.
+* **Deployment**: Manages pod lifecycle and replicas.
+* **ReplicaSet**: Ensures a set number of pod replicas.
+* **StatefulSet**: Manages stateful apps with persistent identity and storage.
+* **DaemonSet**: Ensures one pod runs per node.
+* **Job**: Runs tasks to completion.
+* **CronJob**: Runs jobs on a schedule.
+* **Service**: Exposes pods to other pods or external users.
+* **ConfigMap/Secret**: Manage configuration and sensitive data.
+* **Namespace**: Isolate resources within a cluster.
+
+## 6. Scheduler and Controllers
+
+* **Scheduler**:
+
+  * Assigns pods to suitable nodes based on constraints and availability.
+
+* **Controllers**:
+
+  * Ensure system maintains the desired state.
+  * Include Deployment, ReplicaSet, StatefulSet controllers, etc.
+
+## 7. Kubernetes Storage
+
+* **Volumes**: Provide storage accessible to containers. Can be ephemeral or persistent.
+* **Persistent Volume (PV)**: Represents provisioned storage.
+* **Persistent Volume Claim (PVC)**: Requests for storage by users.
+* **Storage Class**: Describes storage types and dynamic provisioning.
+
+## 8. Kubernetes RBAC (Role-Based Access Control)
+
+* **Role**: Defines permissions within a namespace.
+* **ClusterRole**: Defines permissions cluster-wide.
+* **RoleBinding**: Assigns a Role to a user or service account in a namespace.
+* **ClusterRoleBinding**: Assigns a ClusterRole at the cluster level.
+
+## 9. Kubernetes API
+
+* **API Server** is the primary interface.
+* Exposes REST API for managing resources.
+* Supports communication between all components and external tools.
+
+## 10. Kubernetes Ecosystem Tools
+
+* **Helm**: Package manager for Kubernetes.
+* **Istio**: Service mesh for traffic management and security.
+* **Prometheus/Grafana**: Monitoring and visualization.
+* **ArgoCD**: GitOps-based CD tool.
+
+---
+
+Kubernetes' architecture separates concerns effectively, allowing powerful, scalable, and maintainable container orchestration.

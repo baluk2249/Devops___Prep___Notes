@@ -1,0 +1,131 @@
+# Kubernetes ConfigMap
+
+## 1. What is a ConfigMap?
+
+A **ConfigMap** is a Kubernetes API object used to store **non-confidential configuration data** in key-value pairs.
+
+* It allows decoupling configuration artifacts from image content.
+* Can be consumed in Pods as environment variables, command-line arguments, or mounted volumes.
+
+## 2. Use Cases
+
+* Externalizing configuration from application code.
+* Sharing configuration across multiple Pods.
+* Providing values for environment variables in containers.
+
+## 3. Creating a ConfigMap
+
+### From Literal Key-Value Pairs:
+
+```bash
+kubectl create configmap my-config --from-literal=key1=value1 --from-literal=key2=value2
+```
+
+### From a File:
+
+```bash
+kubectl create configmap app-config --from-file=app.properties
+```
+
+### From a Directory:
+
+```bash
+kubectl create configmap app-config --from-file=config-dir/
+```
+
+## 4. YAML Definition Example
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-config
+  namespace: default
+data:
+  app.properties: |
+    LOG_LEVEL=debug
+    APP_MODE=production
+  database.url: jdbc:mysql://db:3306/mydb
+```
+
+## 5. Consuming ConfigMap in Pods
+
+### a. As Environment Variables:
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: configmap-env-demo
+spec:
+  containers:
+  - name: demo
+    image: busybox
+    command: ["sh", "-c", "env"]
+    envFrom:
+    - configMapRef:
+        name: my-config
+```
+
+### b. As Specific Environment Variables:
+
+```yaml
+    env:
+    - name: LOG_LEVEL
+      valueFrom:
+        configMapKeyRef:
+          name: my-config
+          key: LOG_LEVEL
+```
+
+### c. As Volume:
+
+```yaml
+volumes:
+- name: config-volume
+  configMap:
+    name: my-config
+
+volumeMounts:
+- name: config-volume
+  mountPath: /etc/config
+```
+
+## 6. Updating ConfigMaps
+
+* ConfigMaps can be edited directly:
+
+```bash
+kubectl edit configmap my-config
+```
+
+* Or replaced:
+
+```bash
+kubectl apply -f configmap.yaml
+```
+
+**Note:** Changes are not automatically reflected in running Pods. You need to restart Pods or use a watcher.
+
+## 7. Managing ConfigMaps
+
+```bash
+kubectl get configmaps
+kubectl describe configmap my-config
+kubectl delete configmap my-config
+```
+
+## 8. Best Practices
+
+* Keep ConfigMaps lightweight.
+* Do not store sensitive data (use Secrets instead).
+* Use `envFrom` for bulk environment variable injection.
+* Combine with Deployments for rollout on config change.
+
+## 9. Limitations
+
+* ConfigMap size limit: 1MB.
+* No built-in versioning.
+* Requires pod restart or sidecar reloader to reflect changes in mounted volumes.
+
+---

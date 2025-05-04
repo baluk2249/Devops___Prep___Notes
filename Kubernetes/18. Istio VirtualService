@@ -1,0 +1,143 @@
+# Istio VirtualService
+
+## 1. What is a VirtualService?
+
+A **VirtualService** in Istio defines the rules that control how requests for a service are routed within the service mesh.
+
+It lets you:
+
+* Control traffic routing dynamically without changing service code.
+* Implement A/B testing, canary deployments, and traffic mirroring.
+* Apply retries, timeouts, and fault injection.
+
+## 2. Key Components
+
+* **hosts**: The service name (DNS) this VirtualService applies to.
+* **gateways**: List of gateways to which this rule applies (for ingress traffic).
+* **http/tcp/tls**: Rules based on the protocol.
+* **match**: Conditions for traffic (headers, URI, etc.).
+* **route**: Defines the destination service and subset (version).
+
+## 3. Example: Basic Routing
+
+```yaml
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: reviews-route
+spec:
+  hosts:
+  - reviews
+  http:
+  - route:
+    - destination:
+        host: reviews
+        subset: v1
+```
+
+This routes all traffic to the `reviews` service version v1.
+
+## 4. Example: Canary Deployment
+
+```yaml
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: reviews-split
+spec:
+  hosts:
+  - reviews
+  http:
+  - route:
+    - destination:
+        host: reviews
+        subset: v1
+      weight: 90
+    - destination:
+        host: reviews
+        subset: v2
+      weight: 10
+```
+
+90% of traffic goes to v1, 10% to v2 (canary testing).
+
+## 5. Example: Match Based Routing
+
+```yaml
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: reviews-header-route
+spec:
+  hosts:
+  - reviews
+  http:
+  - match:
+    - headers:
+        end-user:
+          exact: jane
+    route:
+    - destination:
+        host: reviews
+        subset: v2
+  - route:
+    - destination:
+        host: reviews
+        subset: v1
+```
+
+This sends user `jane` to `reviews` v2 and others to v1.
+
+## 6. Example: Timeout and Retry
+
+```yaml
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: reviews-timeout
+spec:
+  hosts:
+  - reviews
+  http:
+  - route:
+    - destination:
+        host: reviews
+    timeout: 5s
+    retries:
+      attempts: 3
+      perTryTimeout: 2s
+```
+
+This sets a 5s timeout and 3 retry attempts with 2s per try.
+
+## 7. Example: Fault Injection
+
+```yaml
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: reviews-fault
+spec:
+  hosts:
+  - reviews
+  http:
+  - fault:
+      delay:
+        percentage:
+          value: 100
+        fixedDelay: 5s
+    route:
+    - destination:
+        host: reviews
+```
+
+This delays all traffic to `reviews` by 5 seconds (used for testing resilience).
+
+## 8. Best Practices
+
+* Use subsets with **DestinationRule** to route between versions.
+* Monitor and validate changes using metrics and tracing.
+* Apply gradual rollout with traffic shifting.
+* Test failure scenarios before production.
+
+---

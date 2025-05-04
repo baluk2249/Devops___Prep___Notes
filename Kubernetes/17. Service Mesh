@@ -1,0 +1,74 @@
+# Kubernetes Service Mesh
+
+## 1. What is a Service Mesh?
+
+A **Service Mesh** is a dedicated infrastructure layer that manages **service-to-service communication** in a microservices architecture. It provides advanced traffic management, security, and observability features without modifying application code.
+
+Popular implementations: **Istio**, **Linkerd**, **Consul Connect**, **Kuma**.
+
+## 2. Why Do We Need a Service Mesh?
+
+In microservices architectures, as the number of services grows, managing traffic, retries, monitoring, and security becomes complex. Service mesh addresses these challenges by providing:
+
+* Fine-grained **traffic control** (routing, retries, timeouts)
+* **Observability** (metrics, tracing, logging)
+* **Security** (mTLS, policies)
+* **Resilience** (circuit breaking, fault injection)
+
+## 3. Problems Solved by Service Mesh
+
+| Problem                       | How Service Mesh Helps                        |
+| ----------------------------- | --------------------------------------------- |
+| Complex service discovery     | Built-in service registry and load balancing  |
+| Lack of observability         | Built-in telemetry, logging, and tracing      |
+| Insecure service comms        | mTLS, identity, authentication, authorization |
+| Inconsistent retries/timeouts | Configurable, centralized traffic control     |
+| Hard to test fault tolerance  | Fault injection, traffic shadowing            |
+| Manual policy enforcement     | Declarative policies via CRDs                 |
+
+## 4. Service Mesh Architecture
+
+* **Data Plane**: Sidecar proxies (e.g., Envoy) deployed alongside each service instance.
+* **Control Plane**: Centralized component that configures and manages the proxies (e.g., Istiod in Istio).
+
+## 5. Service Mesh Example (Istio VirtualService)
+
+```yaml
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: reviews-route
+spec:
+  hosts:
+  - reviews
+  http:
+  - route:
+    - destination:
+        host: reviews
+        subset: v2
+```
+
+This VirtualService routes all traffic to `reviews` service version v2.
+
+## 6. Limitations of Service Mesh
+
+* **Operational Complexity**: Adds extra layers of abstraction and components to manage.
+* **Resource Overhead**: Sidecars consume CPU and memory.
+* **Learning Curve**: Requires understanding networking, security, and mesh-specific CRDs.
+* **Debugging Difficulties**: Troubleshooting mesh behavior can be non-trivial.
+* **Compatibility/Lock-in**: Tied to specific service mesh frameworks.
+
+## 7. When to Use a Service Mesh
+
+* You operate **many microservices** in production.
+* You need **zero-trust security** with mTLS.
+* You want **centralized control** over service communications.
+* You need **deep observability** into service interactions.
+
+## 8. When Not to Use It
+
+* Small number of services.
+* Simpler architecture.
+* Teams not ready to manage mesh complexity.
+
+---
