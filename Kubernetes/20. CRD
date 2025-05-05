@@ -1,0 +1,87 @@
+# Kubernetes CustomResourceDefinition (CRD): Detailed Notes
+
+## What is a CRD?
+
+* A **CustomResourceDefinition (CRD)** allows users to define their own custom resource types in Kubernetes.
+* Extends Kubernetes API without modifying the core Kubernetes source code.
+* Used to define new object kinds (e.g., `MyApp`, `Database`) that behave like built-in resources (Pods, Services, etc).
+
+## Why Use CRDs?
+
+* Implement custom controllers or operators.
+* Support domain-specific objects.
+* Add new abstractions to Kubernetes using native APIs.
+
+## Basic CRD Structure
+
+```yaml
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: crontabs.stable.example.com
+spec:
+  group: stable.example.com
+  versions:
+  - name: v1
+    served: true
+    storage: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              cronSpec:
+                type: string
+              image:
+                type: string
+              replicas:
+                type: integer
+  scope: Namespaced
+  names:
+    plural: crontabs
+    singular: crontab
+    kind: CronTab
+    shortNames:
+    - ct
+```
+
+## Example Custom Resource
+
+```yaml
+apiVersion: stable.example.com/v1
+kind: CronTab
+metadata:
+  name: my-cronjob
+spec:
+  cronSpec: "* * * * */5"
+  image: busybox
+  replicas: 1
+```
+
+## Managing CRDs
+
+* Create CRD: `kubectl apply -f crd.yaml`
+* List CRDs: `kubectl get crds`
+* Get Custom Resources: `kubectl get crontabs`
+
+## Using Controllers with CRDs
+
+* A custom controller/operator watches for events on custom resources and reacts to them (e.g., reconciles state).
+* Tools like Kubebuilder or Operator SDK simplify this development.
+
+## Best Practices
+
+* Use meaningful group/version/kind.
+* Define clear OpenAPI validation schema.
+* Keep custom resources under proper RBAC.
+* Document and version CRDs carefully.
+
+## Real-World Use Cases
+
+* ArgoCD uses CRDs like `Application`.
+* Cert-Manager uses CRDs for certificates, issuers.
+* Istio uses CRDs like `VirtualService`, `DestinationRule`, etc.
+
+---
