@@ -1,0 +1,135 @@
+# Terraform Modules
+
+## What are Terraform Modules?
+
+Modules in Terraform are containers for multiple resources that are used together. A module can be reused, configured with inputs and outputs, and shared between configurations or teams.
+
+There are three types of modules:
+
+* **Root module**: The current working directory where Terraform is run.
+* **Child module**: Any module that is called from another module.
+* **Module Registry module**: Published reusable modules on the Terraform Registry.
+
+---
+
+## Benefits of Using Modules
+
+* Reusability
+* Maintainability
+* Scalability
+* Logical separation
+* DRY (Don't Repeat Yourself) principle
+
+---
+
+## Basic Module Structure
+
+A module typically includes:
+
+* `main.tf`: Contains resource definitions
+* `variables.tf`: Declares input variables
+* `outputs.tf`: Declares outputs from the module
+
+### Directory Structure Example:
+
+```bash
+project/
+├── main.tf
+├── variables.tf
+├── outputs.tf
+├── modules/
+│   └── ec2/
+│       ├── main.tf
+│       ├── variables.tf
+│       └── outputs.tf
+```
+
+---
+
+## Example: Creating and Using a Module
+
+### Step 1: Define the Module (modules/ec2/main.tf)
+
+```hcl
+resource "aws_instance" "this" {
+  ami           = var.ami
+  instance_type = var.instance_type
+
+  tags = {
+    Name = var.name
+  }
+}
+```
+
+### Step 2: Input Variables (modules/ec2/variables.tf)
+
+```hcl
+variable "ami" {
+  type = string
+}
+
+variable "instance_type" {
+  type = string
+  default = "t2.micro"
+}
+
+variable "name" {
+  type = string
+}
+```
+
+### Step 3: Output (modules/ec2/outputs.tf)
+
+```hcl
+output "instance_id" {
+  value = aws_instance.this.id
+}
+```
+
+### Step 4: Use the Module in Root (main.tf)
+
+```hcl
+module "web_instance" {
+  source        = "./modules/ec2"
+  ami           = "ami-0c55b159cbfafe1f0"
+  instance_type = "t2.micro"
+  name          = "MyWebServer"
+}
+
+output "web_instance_id" {
+  value = module.web_instance.instance_id
+}
+```
+
+---
+
+## Using Public Modules from the Terraform Registry
+
+```hcl
+module "vpc" {
+  source  = "terraform-aws-modules/vpc/aws"
+  version = "3.14.0"
+
+  name = "my-vpc"
+  cidr = "10.0.0.0/16"
+
+  azs             = ["us-east-1a", "us-east-1b"]
+  public_subnets  = ["10.0.1.0/24", "10.0.2.0/24"]
+  enable_dns_hostnames = true
+}
+```
+
+---
+
+## Best Practices for Modules
+
+* Keep modules simple and focused
+* Use version control (e.g., Git)
+* Document variables and outputs
+* Avoid hardcoding values
+* Use semantic versioning
+* Validate using `terraform validate`
+
+---
+
+Modules are essential for writing clean, scalable, and maintainable Terraform code, especially in larger infrastructure projects.
