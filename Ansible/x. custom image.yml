@@ -1,0 +1,89 @@
+- name: Prepare GCP VM for Custom Image with JBoss
+  hosts: all
+  become: true
+  vars:
+    jboss_version: "7.4.0.Final"
+    jboss_user: "jboss"
+    install_dir: "/opt/jboss"
+    war_url: "https://example.com/artifacts/myapp.war"
+    props_url: "https://example.com/artifacts/application.properties"
+    image_name: "jboss-custom-image"
+    image_family: "jboss-images"
+    zone: "us-central1-a"
+    disk_name: "{{ ansible_hostname }}"
+    project_id: "your-gcp-project-id"
+
+  tasks:
+
+    - name: Install Java
+      apt:
+        name: openjdk-11-jdk
+        state: present
+        update_cache: yes
+
+    - name: Create JBoss user
+      user:
+        name: "{{ jboss_user }}"
+        shell: /bin/bash
+        create_home: yes
+
+    - name: Create installation directory
+      file:
+        path: "{{ install_dir }}"
+        state: directory
+        owner: "{{ jboss_user }}"
+        mode: '0755'
+
+    - name: Download JBoss
+      get_url:
+        url: "https://download.jboss.org/wildfly/{{ jboss_version }}/wildfly-{{ jboss_version }}.tar.gz"
+        dest: /tmp/jboss.tar.gz
+
+    - name: Extract JBoss
+      unarchive:
+        src: /tmp/jboss.tar.gz
+        dest: "{{ install_dir }}"
+        remote_src: yes
+        creates: "{{ install_dir }}/wildfly-{{ jboss_version }}"
+
+    - name: Symlink JBoss to /opt/jboss/current
+      file:
+        src: "{{ install_dir }}/wildfly-{{ jboss_version }}"
+        dest: "{{ install_dir }}/current"
+        state: link
+
+    - name: Download WAR file from remote repo
+      get_url:
+        url: "{{ war_url }}"
+        dest: "{{ install_dir }}/current/standalone/deployments/myapp.war"
+        mode: '0644'
+        owner: "{{ jboss_user }}"
+
+    - name: Download properties file from remote repo
+      get_url:
+        url: "{{ props_url }}"
+        dest: "{{ install_dir }}/current/standalone/configuration/application.properties"
+        mode: '0644'
+        owner: "{{ jboss_user }}"
+
+    - name: Set environment variable for JAVA_HOME
+      lineinfile:
+        dest: /etc/profile.d/jboss.sh
+        line: 'export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64'
+        create: yes
+        mode: '0755'
+
+    - name: Clean up JBoss archive
+      file:
+        path: /tmp/jboss.tar.gz
+        state: absent
+
+    - name:  Create custom image using gcloud CLI
+      shell: |
+        gcloud compute images create {{ image_name }} \
+          --source-disk={{ disk_name }} \
+          --source-disk-zone={{ zone }} \
+          --family={{ image_family }} \
+          --project={{ project_id }} \
+          --guest-os-features=VIRTIO_SCSI_MULTIQUEUE
+      when: create_image | default(false)
